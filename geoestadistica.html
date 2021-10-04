@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Geoestadística</title>
+
+<script src="site_libs/header-attrs-2.10/header-attrs.js"></script>
+<script src="site_libs/jquery-1.12.4/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/united.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<script src="site_libs/htmlwidgets-1.5.3/htmlwidgets.js"></script>
+<link href="site_libs/leaflet-1.3.1/leaflet.css" rel="stylesheet" />
+<script src="site_libs/leaflet-1.3.1/leaflet.js"></script>
+<link href="site_libs/leafletfix-1.0.0/leafletfix.css" rel="stylesheet" />
+<script src="site_libs/proj4-2.6.2/proj4.min.js"></script>
+<script src="site_libs/Proj4Leaflet-1.0.1/proj4leaflet.js"></script>
+<link href="site_libs/rstudio_leaflet-1.3.1/rstudio_leaflet.css" rel="stylesheet" />
+<script src="site_libs/leaflet-binding-2.0.4.1/leaflet.js"></script>
+<script src="site_libs/leaflet-providers-1.9.0/leaflet-providers_1.9.0.js"></script>
+<script src="site_libs/leaflet-providers-plugin-2.0.4.1/leaflet-providers-plugin.js"></script>
+<link href="site_libs/leaflet-markercluster-1.0.5/MarkerCluster.css" rel="stylesheet" />
+<link href="site_libs/leaflet-markercluster-1.0.5/MarkerCluster.Default.css" rel="stylesheet" />
+<script src="site_libs/leaflet-markercluster-1.0.5/leaflet.markercluster.js"></script>
+<script src="site_libs/leaflet-markercluster-1.0.5/leaflet.markercluster.freezable.js"></script>
+<script src="site_libs/leaflet-markercluster-1.0.5/leaflet.markercluster.layersupport.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">DataScience & Machine Learning Solutions</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="Curvas-COVID-HO.html">Curvas-COVID-HO</a>
+</li>
+<li>
+  <a href="Piramide_Poblacional.html">Piramide Poblacional</a>
+</li>
+<li>
+  <a href="analisis_temporal.html">Análisis Temporal</a>
+</li>
+<li>
+  <a href="Mapas-COVID-HO.html">Mapas COVID-HO</a>
+</li>
+<li>
+  <a href="geoestadistica.html">Geoestadística COVID-HO</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Geoestadística</h1>
+
+</div>
+
+
+<p>Visita la página Web: <a href="https://datascience-machinelearning-solutions.github.io/homepage-ho.github.io/" class="uri">https://datascience-machinelearning-solutions.github.io/homepage-ho.github.io/</a></p>
+<div id="htmlwidget-2abb596e4efa6a24e66e" style="width:672px;height:480px;" class="leaflet html-widget"></div>
+<script type="application/json" data-for="htmlwidget-2abb596e4efa6a24e66e">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,null,{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"http://openstreetmap.org\">OpenStreetMap<\/a> contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA<\/a>"}]},{"method":"addCircles","args":[[14.0818,15.50417,15.75971,14.45139,14.76667,14.66667,13.42417,15.1375,14.31944,15.68333,14.43333,16.31759,14.91944,15.26667,14.31667,15.25,13.30028,13.8667],[-87.20681,-88.025,-86.78221,-87.6375,-88.77917,-86.21944,-87.44722,-87.12778,-87.67917,-86,-89.18333,-86.53793,-88.23611,-83.77222,-88.16667,-84.33333,-87.19083,-86.55],8,null,"Departamentos",{"interactive":true,"className":"","stroke":true,"color":"green","weight":8,"opacity":0.5,"fill":true,"fillColor":"green","fillOpacity":0.2},null,null,["<b>Departamento:<b><br>Francisco Morazán<b><br>Infectados:<b><br>96985<b><br>Muertos:<b><br>2269<b><br>Recuperados:<b><br>19286","<b>Departamento:<b><br>Cortés<b><br>Infectados:<b><br>69194<b><br>Muertos:<b><br>1996<b><br>Recuperados:<b><br>24757","<b>Departamento:<b><br>Atlántida<b><br>Infectados:<b><br>14764<b><br>Muertos:<b><br>392<b><br>Recuperados:<b><br>4795","<b>Departamento:<b><br>Comayagua<b><br>Infectados:<b><br>12593<b><br>Muertos:<b><br>410<b><br>Recuperados:<b><br>4687","<b>Departamento:<b><br>Copán<b><br>Infectados:<b><br>7108<b><br>Muertos:<b><br>314<b><br>Recuperados:<b><br>3723","<b>Departamento:<b><br>Olancho<b><br>Infectados:<b><br>9244<b><br>Muertos:<b><br>351<b><br>Recuperados:<b><br>3006","<b>Departamento:<b><br>Valle<b><br>Infectados:<b><br>7104<b><br>Muertos:<b><br>175<b><br>Recuperados:<b><br>1193","<b>Departamento:<b><br>Yoro<b><br>Infectados:<b><br>15751<b><br>Muertos:<b><br>363<b><br>Recuperados:<b><br>4107","<b>Departamento:<b><br>La Paz<b><br>Infectados:<b><br>10229<b><br>Muertos:<b><br>215<b><br>Recuperados:<b><br>7970","<b>Departamento:<b><br>Colón<b><br>Infectados:<b><br>9224<b><br>Muertos:<b><br>219<b><br>Recuperados:<b><br>1647","<b>Departamento:<b><br>Ocotepeque<b><br>Infectados:<b><br>4264<b><br>Muertos:<b><br>112<b><br>Recuperados:<b><br>2163","<b>Departamento:<b><br>Islas de la Bahía<b><br>Infectados:<b><br>2830<b><br>Muertos:<b><br>51<b><br>Recuperados:<b><br>448","<b>Departamento:<b><br>Santa Bárbara<b><br>Infectados:<b><br>8060<b><br>Muertos:<b><br>297<b><br>Recuperados:<b><br>3686","<b>Departamento:<b><br>Lempira<b><br>Infectados:<b><br>3578<b><br>Muertos:<b><br>162<b><br>Recuperados:<b><br>1886","<b>Departamento:<b><br>Intibucá<b><br>Infectados:<b><br>7334<b><br>Muertos:<b><br>146<b><br>Recuperados:<b><br>2743","<b>Departamento:<b><br>Gracias a Dios<b><br>Infectados:<b><br>1541<b><br>Muertos:<b><br>27<b><br>Recuperados:<b><br>484","<b>Departamento:<b><br>Choluteca<b><br>Infectados:<b><br>8107<b><br>Muertos:<b><br>256<b><br>Recuperados:<b><br>2909","<b>Departamento:<b><br>El Paraíso<b><br>Infectados:<b><br>18026<b><br>Muertos:<b><br>365<b><br>Recuperados:<b><br>11697"],{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null,null]},{"method":"addProviderTiles","args":["OpenStreetMap",null,"Rutas",{"errorTileUrl":"","noWrap":false,"detectRetina":false}]},{"method":"addProviderTiles","args":["Esri.WorldImagery",null,"Satelite",{"errorTileUrl":"","noWrap":false,"detectRetina":false}]},{"method":"addProviderTiles","args":["OneMapSG.Default",null,"Precipitacion",{"errorTileUrl":"","noWrap":false,"detectRetina":false}]},{"method":"addProviderTiles","args":["OpenStreetMap.HOT",null,"Presion",{"errorTileUrl":"","noWrap":false,"detectRetina":false}]},{"method":"addLayersControl","args":[["Rutas","Satelite","Precipitacion","Presion"],[],{"collapsed":true,"autoZIndex":true,"width":40,"height":40,"position":"topright"}]},{"method":"addLegend","args":[{"colors":["#03F"],"labels":["Fuente: SINAGER al 06/08/21 https://covid19honduras.org/ "],"na_color":null,"na_label":"NA","opacity":0.5,"position":"bottomright","type":"unknown","title":null,"extra":null,"layerId":null,"className":"info legend","group":null}]}],"limits":{"lat":[13.30028,16.31759],"lng":[-89.18333,-83.77222]}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-058f6014441ced46be10" style="width:672px;height:480px;" class="leaflet html-widget"></div>
+<script type="application/json" data-for="htmlwidget-058f6014441ced46be10">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,null,{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"http://openstreetmap.org\">OpenStreetMap<\/a> contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA<\/a>"}]},{"method":"addMarkers","args":[[14.0818,15.50417,15.75971,14.45139,14.76667,14.66667,13.42417,15.1375,14.31944,15.68333,14.43333,16.31759,14.91944,15.26667,14.31667,15.25,13.30028,13.8667],[-87.20681,-88.025,-86.78221,-87.6375,-88.77917,-86.21944,-87.44722,-87.12778,-87.67917,-86,-89.18333,-86.53793,-88.23611,-83.77222,-88.16667,-84.33333,-87.19083,-86.55],null,null,null,{"interactive":true,"draggable":false,"keyboard":true,"title":"","alt":"","zIndexOffset":0,"opacity":1,"riseOnHover":false,"riseOffset":250},["<b>Departamento:<b><br>Francisco Morazán<b><br>Infectados:<b><br>96985<b><br>Muertos:<b><br>2269<b><br>Recuperados:<b><br>19286","<b>Departamento:<b><br>Cortés<b><br>Infectados:<b><br>69194<b><br>Muertos:<b><br>1996<b><br>Recuperados:<b><br>24757","<b>Departamento:<b><br>Atlántida<b><br>Infectados:<b><br>14764<b><br>Muertos:<b><br>392<b><br>Recuperados:<b><br>4795","<b>Departamento:<b><br>Comayagua<b><br>Infectados:<b><br>12593<b><br>Muertos:<b><br>410<b><br>Recuperados:<b><br>4687","<b>Departamento:<b><br>Copán<b><br>Infectados:<b><br>7108<b><br>Muertos:<b><br>314<b><br>Recuperados:<b><br>3723","<b>Departamento:<b><br>Olancho<b><br>Infectados:<b><br>9244<b><br>Muertos:<b><br>351<b><br>Recuperados:<b><br>3006","<b>Departamento:<b><br>Valle<b><br>Infectados:<b><br>7104<b><br>Muertos:<b><br>175<b><br>Recuperados:<b><br>1193","<b>Departamento:<b><br>Yoro<b><br>Infectados:<b><br>15751<b><br>Muertos:<b><br>363<b><br>Recuperados:<b><br>4107","<b>Departamento:<b><br>La Paz<b><br>Infectados:<b><br>10229<b><br>Muertos:<b><br>215<b><br>Recuperados:<b><br>7970","<b>Departamento:<b><br>Colón<b><br>Infectados:<b><br>9224<b><br>Muertos:<b><br>219<b><br>Recuperados:<b><br>1647","<b>Departamento:<b><br>Ocotepeque<b><br>Infectados:<b><br>4264<b><br>Muertos:<b><br>112<b><br>Recuperados:<b><br>2163","<b>Departamento:<b><br>Islas de la Bahía<b><br>Infectados:<b><br>2830<b><br>Muertos:<b><br>51<b><br>Recuperados:<b><br>448","<b>Departamento:<b><br>Santa Bárbara<b><br>Infectados:<b><br>8060<b><br>Muertos:<b><br>297<b><br>Recuperados:<b><br>3686","<b>Departamento:<b><br>Lempira<b><br>Infectados:<b><br>3578<b><br>Muertos:<b><br>162<b><br>Recuperados:<b><br>1886","<b>Departamento:<b><br>Intibucá<b><br>Infectados:<b><br>7334<b><br>Muertos:<b><br>146<b><br>Recuperados:<b><br>2743","<b>Departamento:<b><br>Gracias a Dios<b><br>Infectados:<b><br>1541<b><br>Muertos:<b><br>27<b><br>Recuperados:<b><br>484","<b>Departamento:<b><br>Choluteca<b><br>Infectados:<b><br>8107<b><br>Muertos:<b><br>256<b><br>Recuperados:<b><br>2909","<b>Departamento:<b><br>El Paraíso<b><br>Infectados:<b><br>18026<b><br>Muertos:<b><br>365<b><br>Recuperados:<b><br>11697"],null,{"showCoverageOnHover":true,"zoomToBoundsOnClick":true,"spiderfyOnMaxZoom":true,"removeOutsideVisibleBounds":true,"spiderLegPolylineOptions":{"weight":1.5,"color":"#222","opacity":0.5},"freezeAtZoom":false},null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addLayersControl","args":[["Rutas","Satelite","Precipitacion","Presion"],[],{"collapsed":true,"autoZIndex":true,"width":40,"height":40,"position":"topright"}]},{"method":"addLegend","args":[{"colors":["#03F"],"labels":["Fuente: SINAGER al 06/08/21 https://covid19honduras.org/ "],"na_color":null,"na_label":"NA","opacity":0.5,"position":"bottomright","type":"unknown","title":null,"extra":null,"layerId":null,"className":"info legend","group":null}]}],"limits":{"lat":[13.30028,16.31759],"lng":[-89.18333,-83.77222]}},"evals":[],"jsHooks":[]}</script>
+<pre><code>## Data: (c) OpenStreetMap contributors, ODbL 1.0 - http://www.openstreetmap.org/copyright</code></pre>
+<pre><code>## Routing: OSRM - http://project-osrm.org/</code></pre>
+<p>Explorando datos</p>
+<p>``</p>
+<p>Explorar distribución de valores</p>
+<pre class="r"><code>knitr::opts_chunk$set(echo = FALSE)
+hist(depa3$MUERTE, main= &quot;Muertes por COVID&quot;, xlab=&quot;&quot;, border = &quot;blue&quot;, color= &quot;green&quot;)</code></pre>
+<pre><code>## Warning in plot.window(xlim, ylim, &quot;&quot;, ...): &quot;color&quot; is not a graphical
+## parameter</code></pre>
+<pre><code>## Warning in title(main = main, sub = sub, xlab = xlab, ylab = ylab, ...): &quot;color&quot;
+## is not a graphical parameter</code></pre>
+<pre><code>## Warning in axis(1, ...): &quot;color&quot; is not a graphical parameter</code></pre>
+<pre><code>## Warning in axis(2, ...): &quot;color&quot; is not a graphical parameter</code></pre>
+<p><img src="geoestadistica_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<p>Ver outliers numéricos <img src="geoestadistica_files/figure-html/unnamed-chunk-12-1.png" width="672" /> Explorar distribucion espacial de variables de interes con tmap</p>
+<p><img src="geoestadistica_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<p><img src="geoestadistica_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<p><img src="geoestadistica_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<p>Vecinos</p>
+<p>Lista de vecinos (de clase nb) a partir de los poligonos con poly2nb</p>
+<p>poly2nb(polis, row.names = NULL, queen=TRUE,)</p>
+<p>polis pueden ser sf o SpatialPolygons (sp) row.names = columna con el id o nombre de los poligonos queen = True vecinos por 1 punto de borde, False vecinos por dos o mas puntos de borde</p>
+<pre><code>## Loading required package: sp</code></pre>
+<pre><code>## Loading required package: spData</code></pre>
+<p>Explorar los vecinos</p>
+<p>Mapear los vecinos</p>
+<p><img src="geoestadistica_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
+<p>¿Cómo seria con los pesos estandarizados por fila (style=‘W’)?</p>
+<p>Matrix de pesos en formato listw</p>
+<pre><code>## Characteristics of weights list object:
+## Neighbour list object:
+## Number of regions: 297 
+## Number of nonzero links: 1586 
+## Percentage nonzero weights: 1.798002 
+## Average number of links: 5.340067 
+## 4 regions with no links:
+## 155 157 240 273
+## 
+## Weights style: B 
+## Weights constants summary:
+##     n    nn   S0   S1    S2
+## B 293 85849 1586 3172 40360</code></pre>
+<p>Exploración de Indices de asociación/correlación espacial</p>
+<p>Moran I Global</p>
+<pre><code>## 
+##  Moran I test under randomisation
+## 
+## data:  depa3$MUERTE  
+## weights: lwb 
+## omitted: 10, 13, 25, 32, 40, 52, 77, 106, 166, 173, 181, 184, 200, 201, 202, 203, 208, 209, 218, 232, 234, 250, 278, 293, 294, 295, 296 n reduced by no-neighbour observations
+##   
+## 
+## Moran I statistic standard deviate = 0.25997, p-value = 0.3974
+## alternative hypothesis: greater
+## sample estimates:
+## Moran I statistic       Expectation          Variance 
+##      0.0028988023     -0.0038022814      0.0006644451</code></pre>
+<p>Cómo se interpretan el valor de Moran I? ¿Alguno es significativo?7</p>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
