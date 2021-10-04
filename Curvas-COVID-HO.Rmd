@@ -1,0 +1,210 @@
+---
+title: "Curvas COVID-HO"
+
+---
+
+
+ANÁLISIS EXPLORATORIO: GRAFICOS DE DENSIDAD Y CURVAS DEL COVID-19 EN HONDURAS BASADO EN EL INDICE DE INCIDENCIA A 7 Y 14 DÍAS 
+
+FUENTE: DOMO CORONAVIRUS TRACKER https://www.domo.com/covid19/data-explorer/all/
+
+
+Visita nuestra página Web: https://datascience-machinelearning-solutions.github.io/homepage-ho.github.io/
+
+```{r include=F}
+
+
+library(data.table)
+library(lubridate)
+library(tidyverse)
+datacovid_2021<-fread("C:/Users/ladylee/Desktop/Shiny_r/Country Summary-Data Grid-2021.csv")
+
+
+datacovid_2021%>% 
+        mutate(Date= as.IDate(Date))
+
+datacovid_2020<-fread("C:/Users/ladylee/Desktop/Shiny_r/Detailed Data Grid (Country level summary below).csv")
+
+data_2020<-datacovid_2020 %>%
+        dplyr::select(Date, Country, "Confirmed Cases", Recovered, Deaths, "New Cases",
+                      "New Recovered", "New Deaths", "Country Population") %>% 
+        mutate(Date= as.IDate(Date))
+
+#names(data_2020)
+
+Covid_19_ho<-rbind(data_2020, datacovid_2021)
+
+Covid_19_ho_2 <-Covid_19_ho %>%  filter(Date >=  as.IDate("2020-03-10"))
+#str(Covid_19_ho_2)
+
+#ORDENAR POR FECHA
+
+Covid_19_ho_2<- Covid_19_ho_2[order(as.IDate(Covid_19_ho_2$Date)), ]
+```
+
+```{r  echo=FALSE}
+knitr::opts_chunk$set(echo = F)
+
+ggplot(data= data.frame (Covid_19_ho_2), aes(x=Covid_19_ho_2$`New Deaths`)) +
+        geom_density(fill="red", color="#e9ecef",  frame = Covid_19_ho_2$`New Deaths`, alpha=0.8)+
+        labs("Gráfico de Densidad COVID-19 Muertes Honduras", 
+        x= "Nuevas muertes diarias", y= "densidad",
+        caption = " Fuente: DOMO CORONAVIRUS TRACKER") +
+       theme_bw()
+
+```
+
+
+```{r echo=FALSE}
+knitr::opts_chunk$set(echo = F)
+ggplot(data= data.frame (Covid_19_ho_2), aes(x=Covid_19_ho_2$`New Cases`)) +
+        geom_density(fill="#69b3a2", color="#e9ecef",  frame = Covid_19_ho_2$`New Cases`, alpha=0.8)+
+        labs("Gráfico de Densidad COVID-19 Nuevos Casos Honduras", x= "Nuevas casos diarios", y= "densidad",
+             caption = " Fuente: DOMO CORONAVIRUS TRACKER") +
+        theme_bw()
+```
+
+
+```{r echo=FALSE}
+knitr::opts_chunk$set(echo = F)
+ggplot(data= data.frame (Covid_19_ho_2), aes(x=Covid_19_ho_2$`New Recovered`)) +
+        geom_density(fill="#69b3a2", color="#e9ecef",  frame = Covid_19_ho_2$`New Cases`, alpha=0.8)+
+        labs("Gráfico de Densidad COVID-19 Pacientes Recuperados Honduras", x= "Nuevos recuperaciones diarias", y= "densidad",
+             caption = " fuente: DOMO CORONAVIRUS TRACKER") +
+        theme_bw()
+
+
+```
+
+
+```{r echo=FALSE}
+
+Covid_19_ho_2 <- Covid_19_ho_2%>%
+                dplyr::mutate(dia_semana=wday(Date, label = TRUE, abbr = F))
+        
+        Covid_19_ho_2<- Covid_19_ho_2 %>%
+                dplyr::mutate(dia= day(Date))
+        
+        Covid_19_ho_2 <- Covid_19_ho_2 %>%
+                dplyr::mutate(semana= week(Date))
+                              
+        Covid_19_ho_2 <- Covid_19_ho_2 %>%
+              dplyr::mutate(mes= month(Date))
+        
+        
+        Covid_19_ho_2 <- Covid_19_ho_2 %>%
+                dplyr::mutate(Ano = year(Date))
+        
+        
+```
+
+
+```{r echo=FALSE}
+knitr::opts_chunk$set(echo = F)
+ggplot(data= data.frame (Covid_19_ho_2), aes(x=Covid_19_ho_2$Date, y = Covid_19_ho_2$`New Cases`)) +
+                geom_smooth(fill="#69b3a2", color="#e9ecef",  frame = Covid_19_ho_2$`New Cases`, alpha=0.8)+
+                ggtitle("Gráfico de tendencia COVID-19 NUEVOS CASOS Honduras") +
+                scale_x_date(date_breaks = "1 month", date_labels =  "%b %Y") +
+                theme(axis.text.x = element_text(angle=45, hjust = 1))+
+                labs(title = "Casos por mes y año",
+                     subtitle = "Año 2020",
+                     
+                     x = "Mes",
+                     y = "Cantidad",
+                     color = "Año",
+                     caption = "Fuente: DOMO CORONAVIRUS TRACKER")
+
+       
+```
+
+
+
+```{r echo=FALSE}
+knitr::opts_chunk$set(echo = F)
+library(readxl)
+sf<-read_xlsx("C:/Users/ladylee/Desktop/Shiny_r/covid_input_7_14.xlsx")
+
+
+        sf <-sf %>%  filter(Date >=  as.IDate("2020-03-10"))
+        str(sf)
+        
+        sf <- sf%>%
+                dplyr::mutate(dia_semana=wday(Date, label = TRUE, abbr = F))
+        
+        sf<- sf %>%
+                dplyr::mutate(dia= day(Date))
+        
+        sf <- sf %>%
+                dplyr::mutate(semana= week(Date))
+                              
+        sf <- sf %>%
+                dplyr::mutate(mes= month(Date))
+                                                    
+                                                    
+        sf <- sf %>%
+        dplyr::mutate(Ano = year(Date))
+        
+        sf<-data.frame(sf)
+        
+
+```
+
+
+```{r echo=FALSE}
+knitr::opts_chunk$set(echo = F)
+
+ggplot(data= data.frame (sf), aes(x= as.IDate(sf$Date), 
+                                  y = sf$N_cases_7)) +
+geom_smooth(fill="#69b3a2", color="#e9ecef", alpha=0.8,frame = sf$N_cases_7) +
+
+scale_x_date(date_breaks = "1 month", date_labels =  "%b %Y") +
+theme(axis.text.x = element_text(angle=45, hjust = 1))+
+labs(title = "CURVA COVID-19 NUEVOS CASOS A 7 DÍAS /Honduras",
+                     subtitle = "",
+                     x = "Mes",
+                     y = "Indicidencia de casos 7 días",
+                     color = "Año",
+                     caption = "Fuente: DOMO CORONAVIRUS TRACKER")
+       
+
+```
+
+
+```{r echo=FALSE}
+knitr::opts_chunk$set(echo = F)
+ggplot(data= data.frame (sf), aes(x= as.IDate(sf$Date), 
+                                  y = sf$N_cases_14)) +
+geom_smooth(fill="#69b3a2", color="#e9ecef", alpha=0.8,frame = sf$N_cases_14) +
+scale_x_date(date_breaks = "1 month", date_labels =  "%b %Y") +
+theme(axis.text.x = element_text(angle=45, hjust = 1))+
+labs(title = "CURVA COVID-19 NUEVOS CASOS A 14 DÍAS /Honduras",
+                     subtitle = "",
+                     x = "Mes",
+                     y = "Indicidencia de casos 7 días",
+                     color = "Año",
+                     caption = "Fuente: DOMO CORONAVIRUS TRACKER")
+       
+
+```
+
+
+```{r echo=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+ggplot(data= data.frame (sf), aes(x= as.IDate(sf$Date), 
+                                  y = sf$New_D_7)) +
+
+geom_smooth(fill="red", color="#e9ecef", alpha=0.8,frame = sf$New_D_7) +
+scale_x_date(date_breaks = "1 month", date_labels =  "%b %Y") +
+theme(axis.text.x = element_text(angle=45, hjust = 1))+
+labs(title = "CURVA COVID-19 NUEVAS MUERTES A 7 DÍAS /Honduras",
+                     subtitle = "",
+                     x = "Mes",
+                     y = "Indicidencia de muertes 7 días",
+                     color = "Año",
+                     caption = "Fuente: DOMO CORONAVIRUS TRACKER")
+       
+
+
+```
+

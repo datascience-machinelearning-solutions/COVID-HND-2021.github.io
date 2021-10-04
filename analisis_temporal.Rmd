@@ -1,0 +1,312 @@
+---
+title: "Análisis Temporal"
+---
+
+
+Visita la página Web: https://datascience-machinelearning-solutions.github.io/homepage-ho.github.io/
+
+```{r include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(data.table)
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(lubridate)
+library(plotly)
+library(sf)
+library(epiDisplay)
+library(viridis)
+library(writexl)
+library(readxl)
+datacovid_observatorio<-fread("C:/Users/ladylee/Desktop/Shiny_r/BD Coronavirus 1jul21.csv",
+                                      stringsAsFactors = TRUE )
+
+head(datacovid_observatorio$Fecha)
+```
+
+
+```{r include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+datacovid_observatorio<- datacovid_observatorio %>%
+  mutate(Fecha=dmy(Fecha))
+
+```
+
+```{r include=FALSE }
+knitr::opts_chunk$set(echo = FALSE)
+
+
+datacovid_observatorio <- datacovid_observatorio %>%
+  dplyr::mutate(dia_semana=wday(Fecha, label = TRUE, abbr = F))
+
+datacovid_observatorio <- datacovid_observatorio %>%
+  mutate(dia= day(Fecha))
+
+datacovid_observatorio <- datacovid_observatorio %>%
+  mutate(semana= week(Fecha))
+
+
+datacovid_observatorio <- datacovid_observatorio %>%
+  mutate(Ano= year(Fecha))
+head(datacovid_observatorio)
+```
+
+
+
+```{r include= FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+datacovid_observatorio%>%
+         filter (`Tipo de Dato`=="MUERTE") %>% 
+         group_by(Fecha) %>%
+         summarise(cantidad=n())
+```
+
+```{r echo= FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+ggplot(datacovid_observatorio%>%
+         filter (`Tipo de Dato`=="CASOS") %>% 
+         group_by(Fecha) %>%
+         summarise(cantidad=n())) + 
+    geom_line(aes(x = Fecha, y = cantidad))+
+  scale_x_date(date_breaks = "1 month", date_labels =  "%b %Y") +
+  theme(axis.text.x=element_text(angle=60, hjust=1))+
+  labs(title = "Cantidad de casos en Honduras hasta el 1 de julio 2021",
+       
+       x= "Fecha", y= "Número de casos",  
+       caption = "Fuente: Observatorio Demgráfico Universitario UNAH")
+
+
+```
+
+```{r echo= FALSE}
+
+ggplot(datacovid_observatorio%>%
+         filter (`Tipo de Dato`=="MUERTE") %>% 
+         group_by(Fecha) %>%
+         summarise(cantidad=n())) + 
+    geom_line(aes(x = Fecha, y = cantidad, color ="red"))+
+  scale_x_date(date_breaks = "1 month", date_labels =  "%b %Y") +
+  theme(axis.text.x=element_text(angle=60, hjust=1))+
+  labs(title = "Cantidad de Muertes en Honduras hasta el 1 de julio 2021",
+       color= "Muertes",
+       
+       x= "Fecha", y= "Número de Muertes",  
+       caption = "Fuente: Observatorio Demgráfico Universitario UNAH")
+
+
+```
+
+```{r echo=FALSE}
+
+
+x<-ggplot(datacovid_observatorio%>%
+         filter (`Tipo de Dato`=="RECUPERADO") %>% 
+         group_by(Fecha) %>%
+         summarise(cantidad=n())) + 
+    geom_line(aes(x = Fecha, y = cantidad))+
+  scale_x_date(date_breaks = "1 month", date_labels =  "%b %Y") +
+  theme(axis.text.x=element_text(angle=60, hjust=1))+
+  labs(title = "Cantidad de Recuperados en Honduras hasta el 1 de julio 2021",
+       
+       x= "Fecha", y= "Número de Recuperados",  
+       caption = "Fuente: Observatorio COVID/UNAH")
+ggplotly(x)
+
+```
+
+
+```{r include=FALSE}
+
+datacovid_observatorio <- datacovid_observatorio %>% 
+  mutate(mes = lubridate::month(Fecha, label=TRUE)) %>%  drop_na()
+tail(datacovid_observatorio)
+
+```
+```{r echo=FALSE}
+
+ggplot(datacovid_observatorio %>%  
+        filter(Fecha < "2021-07-01") %>% 
+        filter(`Tipo de Dato`== "CASOS") %>% 
+         
+group_by(Ano, mes) %>%
+summarise(cantidad=n()))+
+geom_line(aes(x = mes, y=cantidad, group = Ano, color= as.factor(Ano)), size=1 )+
+
+   theme(axis.text.x = element_text(angle=45, hjust = 1))+
+  labs(title = "Casos por mes y año",
+         subtitle = "Año 2020",
+    
+         x = "Mes",
+         y = "Cantidad",
+         color = "Año",
+         caption = "Fuente: Observatorio Demográdico Universitario UNAH")
+
+
+```
+
+
+```{r echo=FALSE}
+ggplot(datacovid_observatorio %>% filter(Fecha < "2021-01-01")) + 
+  geom_bar(aes(x = mes, fill= `Tipo de Dato`)) +
+
+  theme(axis.text.x=element_text(angle=60, hjust=1))+
+  scale_fill_manual(values=c("grey69", "red", "green"))+
+    labs(title = "Tipo de casos por mes",
+         subtitle = "Año 2020",
+    
+         x = "Mes",
+         y = "Cantidad",
+         fill = "Tipo de Dato",
+         caption = "Fuente: Observatorio Demográdico Universitario UNAH")
+
+
+```
+
+
+```{r echo=FALSE}
+ggplot(datacovid_observatorio %>% filter(Fecha >= "2021-01-01" & Fecha < "2021-07-01")) + 
+  geom_bar(aes(x = mes, fill= `Tipo de Dato`)) +
+
+  theme(axis.text.x=element_text(angle=60, hjust=1))+
+  scale_fill_manual(values=c("grey69", "red", "green"))+
+    labs(title = "Tipo de caso por mes",
+         subtitle = "Año 2021",
+    
+         x = "Mes",
+         y = "Cantidad",
+         fill = "Tipo de Dato",
+         caption = "Fuente: Observatorio Demográfico Universitario UNAH")
+
+
+```
+
+
+
+
+
+```{r include=FALSE}
+
+q<-datacovid_observatorio %>%
+         dplyr::filter(datacovid_observatorio$`Tipo de Dato`== "CASOS") %>% 
+         group_by(Ano) %>%
+         summarise(cantidad=n(), total= sum(Ano)) %>% arrange(desc(cantidad))
+q
+```
+
+
+```{r echo=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+ggplot(datacovid_observatorio %>% filter(Fecha >= "2021-01-01" & Fecha < "2021-07-01")) + 
+    geom_bar(aes(x = dia_semana, fill= `Tipo de Dato` ))+
+  scale_fill_manual(values=c("grey69", "red", "green"))+
+  labs(title = "Tipo de caso por día de Semana año 2021",
+         subtitle = "",
+         x = "día de la semana",
+         y = "Cantidad",
+         caption = "Fuente: Observatorio Demográfico Universitario UNAH")
+
+
+
+```
+
+
+```{r echo=FALSE}
+
+ggplot(datacovid_observatorio  %>% filter(Fecha >= "2021-01-01" & Fecha < "2021-07-01")) + 
+    geom_bar(aes(x = dia_semana, fill=`Tipo de Dato`), position = "dodge")+
+  scale_fill_manual(values=c("grey69", "red", "green"))+
+  labs(title = "Tipo de caso por día de Semana año 2021",
+         subtitle = "",
+         x = "día de la semana",
+         y = "Cantidad",
+         caption = "Fuente: Observatorio Demográfico Universitario UNAH")
+
+
+```
+
+
+```{r echo=FALSE}
+
+ggplot(datacovid_observatorio %>% 
+         filter(Fecha >= "2021-01-01" & Fecha < "2021-07-01")%>%
+         group_by(`Tipo de Dato`, dia_semana) %>%
+         summarise(cantidad=n())) +
+
+
+    geom_line(aes(x = dia_semana, y=cantidad, group = `Tipo de Dato`, color = `Tipo de Dato`), size=1) +
+     scale_fill_manual(labels =c("grey69", "red", "green"), values = c("grey69"= "grey69", "red"= "red", "green"= "green")) + 
+    geom_point(aes(x = dia_semana, y=cantidad, color = `Tipo de Dato`), size=2)+
+  
+    geom_text(aes(x = dia_semana, y=cantidad+200, label=cantidad), size=2)+
+    
+    
+    labs(title = "Cantidad de casos, muertes y recuperación según día de la semana",
+         subtitle = "",
+         x = "Día de la Semana",
+         y = "Cantidad",
+         color = "Tipo de casos",
+         caption = "Fuente: Observatorio Demográfico Universitario UNAH")
+
+```
+hagamos zoom a muerte
+
+```{r echo=FALSE}
+
+ggplot(datacovid_observatorio %>%
+         filter(Fecha >= "2021-01-01" & Fecha < "2021-07-01")%>%
+         filter(`Tipo de Dato` == "MUERTE") %>% 
+         group_by(dia_semana, `Tipo de Dato`) %>%
+         summarise(cantidad = n())) + 
+    geom_line(aes(x = dia_semana, y = cantidad, group =  `Tipo de Dato`, color =  `Tipo de Dato`), size=1) +
+    geom_point(aes(x= dia_semana, y=cantidad, color =  `Tipo de Dato`), size=2)+
+    labs(title = "Muerte por día de Semana",
+         subtitle = "",
+         x = "Día de la semana",
+         y = "Cantidad",
+         color = "",
+         caption = "Fuente: Observatorio Demográfico Universitario UNAH")
+
+```
+
+
+
+```{r echo=FALSE}
+
+
+ggplot(datacovid_observatorio %>%
+         filter(Fecha >= "2021-01-01" & Fecha < "2021-07-01")%>%
+         filter(`Tipo de Dato`=="CASOS") %>% 
+         group_by(semana) %>%
+         summarise(cantidad = n())) + 
+    geom_line(aes(x = semana, y = cantidad), size=1)+
+    scale_x_continuous(breaks = seq(1,54))+
+  labs(title = "Casos por Semana año 2021",
+         subtitle = "",
+         x = "semana",
+         y = "Cantidad",
+         caption = "Fuente: Observatorio Demográfico Universitario UNAH")
+
+```
+
+
+```{r echo=FALSE}
+
+
+ggplot(datacovid_observatorio %>% 
+filter(`Tipo de Dato` == "MUERTE") %>%    
+group_by(Ano, semana) %>%
+
+summarise(cantidad=n()))+
+geom_line(aes(x = semana, y=cantidad, group = Ano, color= as.factor(Ano)), size=1 )+
+  labs(title = "MUERTE por Semana",
+         subtitle = "",
+         x = "semana",
+         y = "Cantidad",
+         color = "Año",
+         caption = "Fuente: Observatorio Demográfico Universitario UNAH")
+
+
+```
+

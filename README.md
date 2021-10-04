@@ -1,1 +1,1 @@
-# COVID-HND-2021.github.io
+# GIS-COVID-HO.github.io

@@ -1,0 +1,21 @@
+name: "DataScience & Machine Learning Solutions"
+navbar:
+   title: "DataScience & Machine Learning Solutions"
+   left:
+     - text: "Home"
+       href: index.html
+     - text: "Curvas-COVID-HO"
+       href: Curvas-COVID-HO.html
+     - text: "Piramide Poblacional"
+       href: Piramide_Poblacional.html
+     - text: "Análisis Temporal"
+       href: analisis_temporal.html
+     - text: "Mapas COVID-HO"
+       href:  Mapas-COVID-HO.html 
+     - text: "Geoestadística COVID-HO"
+       href: geoestadistica.html
+output:
+   html_document:
+       theme: united
+       highlight: textmate
+       
